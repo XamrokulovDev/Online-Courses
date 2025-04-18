@@ -23,12 +23,14 @@ exports.register = asyncHandler(async (req, res, next) => {
     if (password.length < 4) {
         return next(new ErrorResponse('Password must be at least 4 characters long', 400));
     }
+
     const existingUser = await User.findOne({
         $or: [
             { email: email.toLowerCase() },
-            { username: username }
+            { username: username.toLowerCase() } 
         ]
     });
+
     if (existingUser) {
         return next(new ErrorResponse('This username or email is already registered', 400));
     }
@@ -42,7 +44,7 @@ exports.register = asyncHandler(async (req, res, next) => {
     }
 
     const user = await User.create({
-        username,
+        username: username.toLowerCase(),
         email: email.toLowerCase(),
         password,
         role,
@@ -72,7 +74,7 @@ exports.login = asyncHandler(async(req, res, next) => {
         return next(new ErrorResponse('Please provide all fields', 400));
     }
 
-    const user = await User.findOne({ username }).select('+password');
+    const user = await User.findOne({ username: username.toLowerCase() }).select('+password');
 
     if(!user) {
         return next(new ErrorResponse('Invalid username or password', 401));
@@ -90,5 +92,17 @@ exports.login = asyncHandler(async(req, res, next) => {
         data: user,
         message: "User logged in successfully",
         token,
+    });
+});
+
+// @desc Logout user
+// @route POST /api/v1/auth/logout
+// @access Private
+exports.logout = asyncHandler(async (req, res, next) => {
+    res.clearCookie('token');
+
+    res.status(200).json({
+        success: true,
+        message: 'User logged out successfully',
     });
 });

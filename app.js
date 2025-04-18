@@ -20,6 +20,10 @@ app.use('/api/v1/category', require("./routes/category.route"));
 app.use('/api/v1/course', require("./routes/course.route"));
 app.use('/api/v1/enroll', require("./routes/enroll.route"));
 
+// Swagger
+app.use('/', require('./routes/swagger.route'));
+app.use('/api-docs', require('./routes/swagger.route'));
+
 // Error handling middleware 
 app.use(errorHandler);
 
