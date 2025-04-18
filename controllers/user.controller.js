@@ -2,7 +2,7 @@ const User = require('../models/user.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const uuid = require('uuid');
-const asyncHandler = require('../middlewares/async');
+const asyncHandler = require('../middlewares/async.middleware');
 const ErrorResponse = require('../utils/ErrorResponse');
 
 // @desc Register a new user

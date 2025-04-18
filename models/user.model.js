@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -23,12 +22,12 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['user', 'manager', 'admin'],
+        enum: ['user', 'teacher', 'admin'],
         default: 'user',
     },
     course: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Course',
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
     }],
     balance: {
         type: String,
