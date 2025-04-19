@@ -35,17 +35,10 @@ exports.getCourse = asyncHandler(async (req, res, next) => {
 // @route POST /api/v1/course/create
 // @access Private
 exports.createCourse = asyncHandler(async (req, res, next) => {
-    const { category, title, description, part, rating } = req.body;
+    const { category, title, description, videoUrl, part, rating } = req.body;
 
-    if (!category || !title || !description || !part) {
+    if (!category || !title || !description || !videoUrl || !part) {
         return next(new ErrorResponse('Please provide all required fields', 400));
-    }
-
-    if (!req.file) {
-        return res.status(400).json({
-            success: false,
-            message: "Image is required.",
-        });
     }
 
     const categoryExists = await Category.findOne({ title: category });
@@ -56,11 +49,20 @@ exports.createCourse = asyncHandler(async (req, res, next) => {
         });
     }
 
+
+    if (!req.file) {
+        return res.status(400).json({
+            success: false,
+            message: "Image is required.",
+        });
+    }
+
     const course = await Course.create({
         category,
-        image: req.file.path,
         title,
         description,
+        image: req.file.path,
+        videoUrl,
         part,
         rating,
     });
@@ -81,10 +83,6 @@ exports.updateCourse = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse(`Course not found with id of ${req.params.id}`, 404));
     }
 
-    if (req.file) {
-        req.body.image = req.file.path;
-    }
-
     if (req.body.category) {
         const categoryExists = await Category.findOne({ title: req.body.category });
         if (!categoryExists) {
@@ -93,6 +91,10 @@ exports.updateCourse = asyncHandler(async (req, res, next) => {
                 message: `Category '${req.body.category}' does not exist. Please create the category first.`,
             });
         }
+    }
+
+    if (req.file) {
+        req.body.image = req.file.path;
     }
 
     const updatedCourse = await Course.findByIdAndUpdate(req.params.id, req.body, {

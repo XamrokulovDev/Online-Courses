@@ -24,6 +24,8 @@ exports.getCategory = asyncHandler(async (req, res, next) => {
     }
     res.status(200).json({
         success: true,
+        count: category.length,
+        message: 'Category found successfully',
         data: category
     });
 });
@@ -54,18 +56,15 @@ exports.createCategory = asyncHandler(async (req, res, next) => {
 exports.updateCategory = asyncHandler(async (req, res, next) => {
     const { title } = req.body;
 
-    if (!title) {
-        return next(new ErrorResponse('Please provide all required fields', 400));
-    }
-
     const existingCategory = await Category.findOne({ title });
+
     if (existingCategory && existingCategory._id.toString() !== req.params.id) {
         return next(new ErrorResponse('Category with this title already exists', 400));
     }
 
     const category = await Category.findByIdAndUpdate(
         req.params.id,
-        { title },
+        req.body,
         { new: true, runValidators: true }
     );
 
@@ -75,6 +74,7 @@ exports.updateCategory = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({
         success: true,
+        message: 'Category updated successfully',
         data: category
     });
 });
